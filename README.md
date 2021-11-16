@@ -14,8 +14,8 @@ Here you can see these files that can help you through this Data Engineering:
 - test.ipynb: testing against DataBase with sql queries.
 
 
-How to execute .py Scripts:
+### How to execute .py Scripts:
 Through console:
 1. Check if you have already installed python with `python -V`
-2. run the command `python create_database.py` to drop the database (if it's already created) and create the database.
-3. 3. run `python etl.py` to execute the etl that transform and populate the dimensions and fact table.
+2. Run the command `python create_database.py` to drop the database (if it's already created) and create the database.
+3. Run `python etl.py` to execute the etl that transform and populate the dimensions and fact table.
