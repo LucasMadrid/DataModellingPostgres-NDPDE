@@ -6,6 +6,18 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """
+     Description: This function is responsible to read song data from 'data/song_data', load it into pandas dataframe called 'df'
+     and extract the song and artist data to insert into song table and artist table.
+     
+     Argument:
+        cur: the cursor object.
+        filepath: path of the folder where is the song data.
+        
+     Returns:
+         None
+    
+    """
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -19,6 +31,21 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """
+     Description: This function is responsible to read data from filepath (log data directory) and load it into a dataframe called 'df' as well as 
+     apply filtering 'NextSong' and apply transformation to load time data into time table, user data into user table, and insert the necessary data
+     for the fact table 'songplay'
+     
+     Arguments:
+        cur: the cursor object.
+        filepath: path of the directory where is the log data.
+        
+     Returns:
+         None
+    
+    """
+    
+    
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -29,7 +56,7 @@ def process_log_file(cur, filepath):
     t = pd.to_datetime(df['ts'], unit='ms')
     
     # insert time data records
-    time_data =(t.dt.time, t.dt.hour, t.dt.day, t.dt.weekofyear, t.dt.month, t.dt.year, t.dt.weekday)
+    time_data =(t, t.dt.hour, t.dt.day, t.dt.weekofyear, t.dt.month, t.dt.year, t.dt.weekday)
     column_labels = ('start_time', 'hour', 'day', 'weewk', 'month', 'year', 'weekday')    
     
     zipped_data = zip(column_labels, time_data)
@@ -61,12 +88,26 @@ def process_log_file(cur, filepath):
 
         # insert songplay record
         
-        songplay_data = (time_df['start_time'][index], row.userId, row.level,
+        songplay_data = (pd.to_datetime(row.ts,unit='ms'), row.userId, row.level, \
                          songid, artistid, row.sessionId, str(row.location),str(row.userAgent))
         cur.execute(songplay_table_insert, songplay_data)
  
 
 def process_data(cur, conn, filepath, func):
+    """
+    Description: This function is responsible for listing the files in a directory,
+    and then executing the loading process for each file corresponding to the function
+    that performs the transformation and load it to the database.
+
+    Arguments:
+        cur: the cursor object.
+        conn: connection to the database.
+        filepath: log data or song data file path directory.
+        func: function that transforms the data and inserts it into the database.
+
+    Returns:
+        None
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
